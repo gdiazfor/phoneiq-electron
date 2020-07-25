@@ -8,9 +8,19 @@
         <script src="assets/js/topbar.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script src="script.js"></script>
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
     </head>
     <body style="overflow: hidden;">
+        <style>
+            /* newGeneralLoader */
+            .newGeneralLoader {margin: 0 auto; width: 50px; height: 50px; position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); z-index: 98;}
+            .circular{animation: newRotate 2s linear infinite; height: 100%; transform-origin: center center; width: 100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; }
+            .path{stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: newDash 1.5s ease-in-out infinite; stroke-linecap: round; stroke: #5078EE; }
+
+            @keyframes newRotate {100% {transform: rotate(360deg); } }
+            @keyframes newDash {0% {stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% {stroke-dasharray: 89, 200; stroke-dashoffset: -35px; } 100% {stroke-dasharray: 89, 200; stroke-dashoffset: -124px; } }
+
+        </style>
         <div class="titlebar">
             <!-- <div class="dragTheWindow"></div> -->
         </div>
@@ -22,20 +32,67 @@
         </div>
         <!-- End topbar -->
 
+        <div class="newGeneralLoader" id="GNRloader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"></circle>
+            </svg>
+        </div>
+
         <!-- Webview -->
-        <webview allowpopups plugins style="height: 100vh;" id="webview" autosize="on" src="https://anakin.xentricqa.com:4434/?sf=ok" data-home="https://anakin.xentricqa.com:4434/?sf=ok"></webview>
-    
-        <script>
-            var webview = document.getElementById('webview');
-                webview.addEventListener('dom-ready', function () {
+        <webview allowpopups plugins style="height: 100vh; z-index: 99999; width: 1024px; position: absolute;" id="webview" autosize="on" src="https://anakin.xentricqa.com:4434/?sf=ok" data-home="https://anakin.xentricqa.com:4434/?sf=ok"></webview>
+
+
+
+<!--         <script>
+            const webview = document.getElementById('webview')
+            console.log(webview.globals)
+            remote.getGlobal(name)
+        </script> -->
+<!--   <script>
+        window.api.receive("fromMain", (data) => {
+            console.log(`Received ${data} from main process`);
+        });
+        window.api.send("toMain", "some data");
+    </script>
+ -->
+  <!--       <script>
+            const webview = document.getElementById('webview')
+            console.log(webview)
+            webview.addEventListener('ipc-message', event => {
+                // prints "ping"
+                console.log(event.channel)
+            })
+
+            webview.addEventListener('message', event => {
+                // prints "ping"
+                console.log(event)
+            })
+
+            webview.addEventListener('message', function(event) {
+                console.log("message")
+            });
+
+              console.log("messageHandler")
+              var messageHandler = function (event) {
+                  console.log("pepe")
+                  if (event.data.key == 'messagesBadgeCount') {
+                     console.log("messasagegge")
+                  }else if (event.data.key == 'phoneBageCount') {
+                     console.log("phoenenien")
+                  }else if (event.data.key == 'showDialogRenameFile') {
+                     console.log("showDialogRenameFileshowDialogRenameFile")
+                  }
+              };
+              webview.addEventListener('message', messageHandler, false);
+
+            const electron = window.require('electron');
+            require('/renderer-process/menus/context-menu');
+
+            webview.addEventListener('dom-ready', function() {
+                console.log("con sole")
                 webview.insertCSS('html,body{ background-color: #FF0000 !important;}')
             });
 
-        </script>
-        <!-- HTML -->
-        <!--
-        <h1>Hello world!</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, voluptatum sint ullam minima molestias nam id autem perferendis! Cumque veritatis sunt dolor quidem cum? Natus dolore ipsum illum numquam molestiae?</p>
-        -->
+        </script> -->
     </body>
 </html>

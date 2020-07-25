@@ -1,14 +1,61 @@
 const electron = require("electron");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-const { Menu, Tray, session, remote, shell, ipcMain } = require('electron')
+const { Menu, Tray, session, remote, Notification, shell } = require('electron')
+const ipcMain = require('electron').ipcMain;
+const contextMenu = require('electron-context-menu')
+
+require('update-electron-app')({
+  repo: 'gdiazfor/phoneiq-electron',
+  updateInterval: '5 minutes'
+})
+
+//const installPostMessage = require('electron-context-menu')
 
 const path = require("path");
 const fs = require("fs");
 
 let tray = null
+let notification = null
+let badgesCounts = 0;
 
-//const { app, Menu, Tray } = require('electron')
+contextMenu({
+    prepend: (defaultActions, params, browserWindow) => [
+        {
+            label: 'Rainbow',
+            // Only show it when right-clicking images
+            visible: params.mediaType === 'image'
+        },
+        {
+            label: 'Search Google for “{selection}”',
+            // Only show it when right-clicking text
+            visible: params.selectionText.trim().length > 0,
+            click: () => {
+                shell.openExternal(`https://google.com/search?q=${encodeURIComponent(params.selectionText)}`);
+            }
+        }
+    ]
+    //,
+    //showInspectElement: false
+});
+
+const notifier = require('node-notifier');
+// String
+//notifier.notify('Message');
+ 
+// Object
+notifier.notify({
+  title: 'Welcome to PhoneIQ!',
+  message: 'Click here to download our other apps!',
+  reply: true,
+  open: 'https://www.phoneiq.co/apps',
+  icon: (__dirname, "assets/icons/png/IconTemplate.png"),
+  //contentImage: (__dirname, "assets/icons/png/IconTemplate.png"),
+  sound: 'Hero',
+  closeLabel: 'Close'
+  //actions: ['Hide', 'Reply'],
+});
+
 
 const template = [
   {
@@ -108,27 +155,54 @@ app.on("ready", () => {
     webPreferences: {
       nodeIntegration: true,
       webviewTag: true,
-      zoomFactor: 1.0,
+      // plugins: true,
+      // zoomFactor: 1.0,
+      // allowpopups: true,
+      //hace funcionar la app sin el tag webvie
+      //contextIsolation: true,
       enableRemoteModule: true,
+      spellcheck: true,
+      preload: path.join(__dirname, "preload.js"),
       allowRunningInsecureContent: true
     },
   });
   
-  //let contents = mainWindow.webContents
-  //console.log(contents)
+  // let contents = mainWindow.webContents
+  // console.log(contents)
+
 
   mainWindow.webContents.send('asynchronous-message', 'ping')
   mainWindow.loadURL("file://" + __dirname + "/index.html");
+  //mainWindow.loadURL('https://anakin.xentricqa.com:4434/?sf=ok')
 
-  // Display Dev Tools
-  //mainWindow.openDevTools();
+
+  mainWindow.webContents.on('did-finish-load', ()=>{
+      //badgesCounts = `console.log(globals)`;
+      //console.log(badgesCounts)
+      //mainWindow.webContents.executeJavaScript(badgesCounts);
+      //app.setBadgeCount(code)
+
+        //let contents = mainWindow.webContents
+        //console.log(contents)
+
+      // mainWindow.webContents.executeJavaScript(`globals.badgeCount`, true)
+      // .then((result) => {
+      //   //console.log(result) // Will be the JSON object from the fetch call
+      //   badgesCounts = result;
+      //   console.log(badgesCounts)
+      //   app.setBadgeCount(badgesCounts)
+      // })
+  });
 
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
   mainWindow.openDevTools();
 
-  tray = new Tray(__dirname + '/assets/icons/png/tray.png')
+  //console.log(mainWindow.webContents)
+  //console.log(app)
+
+  tray = new Tray(__dirname + '/assets/icons/png/IconTemplate.png')
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Online', type: 'radio' },
     { label: 'Away', type: 'radio' },
@@ -153,9 +227,17 @@ app.on("ready", () => {
     } 
   ])
 
-  tray.setTitle("PhoneIQ")
-  tray.setToolTip('Click to open more options')
+  // notification = new Notification('', {
+  //   silent: true
+  // })
+
+
+  //tray.setPressedImage(__dirname + '/assets/icons/png/tray.png')
+  //tray.setTitle("PhoneIQ")
+  //tray.setToolTip('Click to open more options')
   tray.setContextMenu(contextMenu)
+  //console.log(Notification.isSupported())
+  
 
   mainWindow.on('close', (event) => {
     if (app.quitting) {
@@ -176,6 +258,11 @@ app.on('ready', async () => {
 })
 
 
+app.on("web-contents-created", (e, contents) => { 
+if (contents.getType() == "webview") { // set context menu in webview 
+  contextMenu({ window: contents, }); 
+  } 
+});
 
 
 //Listen for web contents being created
