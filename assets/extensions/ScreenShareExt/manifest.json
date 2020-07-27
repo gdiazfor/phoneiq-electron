@@ -1,0 +1,26 @@
+{
+  "name" : "OpenTok Screen Sharing",
+  "version" : "2.0",
+  "manifest_version" : 2,
+  "description" : "This Chrome extension is developed primary for http://tokbox.com/. It doesn't do anything except capture content of your screen.",
+  "background": {
+    "scripts": ["background-script.js"],
+    "persistent": false
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://*.xentricqa.com/*", "https://*.getzero.co/*", "http://localhost:8023/"
+    ]
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuWK3UHKwQjVMhJ/tQMb4UbA/Bib/njfKa0dRf+P45hBkacEZRLkZTA4Bhoj3TH6yXSJsw/I0Ju50K7S1QvwdxPYoE2g2Nsy/JtibgiiruTi8jeRnwyhSxH7KkBUTcDQAh53Ev/JFOWX+rHScaup+ZGjSkUG1WDgO+qVe0y700T12OPFyW9BohBjb9NcJckosFm8NF8v5aJOxYbgzzFeiiEX1Cj+qPp6/LdsOFSFTP0kqY+EyTdI6As15XROVRrrZEOXBhklMkhhzPoW0oI/CQSvtVS199HFKBs7ngDsYXmJL3u7vJQNM0cPhCYmmFC6eGLqv9bjVgCA7ja5uaCB/cwIDAQAB",
+  "icons": {
+    "16": "zero_logo.png",
+    "48": "zero_logo.png",
+    "128": "zero_logo.png",
+    "256": "zero_logo.png"
+  },
+  "permissions": [ "desktopCapture" ],
+  "web_accessible_resources": [
+    "icon.png"
+  ]
+}
