@@ -1,0 +1,14 @@
+/* Main */
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.titlebar{-webkit-app-region: drag; position: absolute; top: 0; width: 100%; height: 22px; z-index: 99999;}
+.thisDrag{-webkit-app-region: no-drag; position: absolute; top: 22px; bottom: 0; width: 100%; height: 100%; z-index: 99999; pointer-events: none;}
+
+/*.titlebar .dragTheWindow{position:absolute; width: 30px;height: 20px;margin:0 auto;left: calc(50% - 20px);display: none;}
+.titlebar:hover .dragTheWindow{width: 30px;height: 20px;margin:0 auto;display: block;}*/
