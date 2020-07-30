@@ -13,26 +13,25 @@ autoUpdater.logger = require("electron-log")
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
-// //const packager = require('electron-packager')
-
-// // packager({
-// //   dir: '/release-builds/PhoneIQ-darwin-x64/',
-// //   osxSign: {
-// //     identity: 'Developer ID Application: NXT  S.R.L (G977B72DJK)'
-// //   }
-// // })
-
-// // --osx-sign.identity='Developer ID Application: NXT  S.R.L (G977B72DJK)'
-
-
-//const installPostMessage = require('electron-context-menu')
-
 const path = require("path");
 const fs = require("fs");
 
 let tray = null
 let notification = null
 let badgesCounts = 0;
+
+//notification.silent(true)
+
+
+var ipc = require('electron').ipcMain;
+
+ipc.on('invokeAction', function(event, data){
+    // var result = data;
+    // event.sender.send('actionReply', result);
+    dialog.showErrorBox("title", "content")
+});
+
+
 
 contextMenu({
     prepend: (defaultActions, params, browserWindow) => [
@@ -154,6 +153,26 @@ app.on("ready", () => {
   //console.log(dialog)
   //console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
 
+
+  // notification.on('show', () => {
+  //   silent: true
+  // })
+
+  // notification = {
+  //     silent: true
+  // }
+
+
+
+  // new Notification({
+  //   title: "test",
+  //   body: "asdasd"
+  //   })
+
+  // notification.on('show'){
+  //       silent: "true"
+  // };
+
   initPath = path.join(app.getPath("userData"), "init.json");
 
   try {
@@ -185,50 +204,111 @@ app.on("ready", () => {
     },
   });
   
+  mainWindow.webContents.send('asynchronous-message', 'ping')
+  mainWindow.loadURL("file://" + __dirname + "/index.html");
+  //mainWindow.loadURL('https://anakin.xentricqa.com:4434/?sf=ok')
   // let contents = mainWindow.webContents
   // console.log(contents)
 
 
-  mainWindow.webContents.send('asynchronous-message', 'ping')
-  mainWindow.loadURL("file://" + __dirname + "/index.html");
-  //mainWindow.loadURL('https://anakin.xentricqa.com:4434/?sf=ok')
+  mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
+  // Set the save path, making Electron not to prompt a save dialog.
+  //item.setSavePath('/tmp/save.pdf')
 
+  // item.on('updated', (event, state) => {
+  //   if (state === 'interrupted') {
+  //     console.log('Download is interrupted but can be resumed')
+  //   } else if (state === 'progressing') {
+  //     if (item.isPaused()) {
+  //       console.log('Download is paused')
+  //     } else {
+  //       console.log(`Received bytes: ${item.getReceivedBytes()}`)
+  //     }
+  //   }
+  // })
+  // item.once('done', (event, state) => {
+  //   if (state === 'completed') {
+  //     console.log('Download successfully')
+  //   } else {
+  //     console.log(`Download failed: ${state}`)
+  //   }
+  // })
+})
 
- autoUpdater.checkForUpdates();
-  
+  //hide menubar in windows
+  mainWindow.setMenuBarVisibility(false)
+
+  //prevenir segunda instancia de app en windows
+  //let myWindow = null
+
+  const gotTheLock = app.requestSingleInstanceLock()
+
+  if (!gotTheLock) {
+    app.quit()
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      // Someone tried to run a second instance, we should focus our window.
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus()
+      }
+    })
+  }
+
+  //Updater
+  autoUpdater.checkForUpdates();
 
   autoUpdater.on('checking-for-update', () => {
     sendStatusToWindow('Checking for update...');
     console.log('Checking for update...')
     dialog.showErrorBox("title", "content")
   });
-  autoUpdater.on('update-available', info => {
-    sendStatusToWindow('Update available.');
-    console.log('Update available');
-    dialog.showErrorBox("title", "Update available")
-  });
+
+  autoUpdater.on('update-available', () => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Found Updates',
+      message: 'There is a new version of PhoneIQ',
+      detail: "Download this version to get the latest features",
+      buttons: ['Start Download', 'Cancel']
+    }, (buttonIndex) => {
+      if (buttonIndex === 0) {
+        autoUpdater.downloadUpdate()
+      }
+      else {
+        updater.enabled = true
+        updater = null
+      }
+    })
+  })
+
   autoUpdater.on('update-not-available', info => {
-    sendStatusToWindow('Update not available.');
-    dialog.showErrorBox("title", "Update not available")
+      // dialog.showMessageBox({
+      //   title: 'No Updates',
+      //   message: 'Current version is up-to-date!'
+      // })
   });
+
   autoUpdater.on('error', err => {
-    sendStatusToWindow(`Error in auto-updater: ${err.toString()}`);
+      // dialog.showMessageBox({
+      //   title: 'No Updates',
+      //   message: 'Error in auto-updater: ${err.toString()}'
+      // })
+    //sendStatusToWindow(`Error in auto-updater: ${err.toString()}`);
   });
+
   autoUpdater.on('download-progress', progressObj => {
     sendStatusToWindow(
       `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}% (${progressObj.transferred} + '/' + ${progressObj.total} + )`
     );
   });
-  autoUpdater.on('update-downloaded', info => {
-    sendStatusToWindow('Update downloaded; will install now');
-  });
 
-  autoUpdater.on('update-downloaded', info => {
-    // Wait 5 seconds, then quit and install
-    // In your application, you don't need to wait 500 ms.
-    // You could call autoUpdater.quitAndInstall(); immediately
-    autoUpdater.quitAndInstall();
-  });
+  autoUpdater.on('update-downloaded', () => {
+    autoUpdater.quitAndInstall()
+    mainWindow.destroy()
+    app.quit()
+  })
+
 
   const sendStatusToWindow = (text) => {
     log.info(text);
@@ -238,21 +318,8 @@ app.on("ready", () => {
   };
 
   mainWindow.webContents.on('did-finish-load', ()=>{
-      //badgesCounts = `console.log(globals)`;
-      //console.log(badgesCounts)
-      //mainWindow.webContents.executeJavaScript(badgesCounts);
-      //app.setBadgeCount(code)
-
-        //let contents = mainWindow.webContents
-        //console.log(contents)
-
-      // mainWindow.webContents.executeJavaScript(`globals.badgeCount`, true)
-      // .then((result) => {
-      //   //console.log(result) // Will be the JSON object from the fetch call
-      //   badgesCounts = result;
-      //   console.log(badgesCounts)
-      //   app.setBadgeCount(badgesCounts)
-      // })
+    //let contents = mainWindow.webContents
+    //console.log(contents)
   });
 
 
@@ -260,17 +327,18 @@ app.on("ready", () => {
   Menu.setApplicationMenu(menu);
   //mainWindow.openDevTools();
 
-  //console.log(mainWindow.webContents)
-  //console.log(app)
-
   tray = new Tray(__dirname + '/assets/icons/png/IconTemplate.png')
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Online', type: 'radio' },
-    { label: 'Away', type: 'radio' },
-    { label: 'Busy', type: 'radio' },
-    { label: '', type: 'separator' },
-    { label: 'Do not disturb', type: 'checkbox' },
-    { label: '', type: 'separator' },
+    //{ label: 'Online', type: 'radio' },
+    //{ label: 'Away', type: 'radio' },
+    //{ label: 'Busy', type: 'radio' },
+    //{ label: '', type: 'separator' },
+    //{ label: 'Do not disturb', type: 'checkbox' },
+    //{ label: '', type: 'separator' },
+    { label: 'Show app', click:  function(){
+          mainWindow.show()
+      } 
+    },
     { label: 'Reload app', click:  function(){
           app.relaunch()
           app.exit(0)
@@ -287,6 +355,12 @@ app.on("ready", () => {
       } 
     } 
   ])
+
+  tray.on('click', function (event) {
+        mainWindow.show();
+  });
+
+
 
   // notification = new Notification('', {
   //   silent: true
@@ -305,7 +379,12 @@ app.on("ready", () => {
       mainWindow = null
     } else {
       event.preventDefault()
-      mainWindow.hide()
+
+      if (process.platform != 'darwin') {
+        mainWindow.minimize()
+      }else{
+        mainWindow.hide()
+      }
     }
   })
 
@@ -362,7 +441,10 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', () => { app.show() })
+app.on('activate', () => { 
+  app.show() 
+  mainWindow.show()
+})
 
 app.on('before-quit', () => app.quitting = true)
 // Quit when all windows are closed.

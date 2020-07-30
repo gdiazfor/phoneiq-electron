@@ -7,7 +7,7 @@
         <script src="assets/js/webview.js"></script>
         <script src="assets/js/topbar.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script src="script.js"></script>
+        <script type="text/javascript" src="script.js"></script>
         <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
     </head>
     <body style="overflow: hidden;">
@@ -26,9 +26,9 @@
         </div>
         <div class="thisDrag"></div>
         <!-- Topbar -->
-        <div id="controls" style="display:none">
-            <button id="home" title="Go Home">Home</button>
-            <button id="print_button">Print</button>
+        <div id="controls" style="">
+            <button id="" title="Go Home">Home</button>
+            <button id="">Print</button>
         </div>
         <!-- End topbar -->
 
@@ -39,8 +39,20 @@
         </div>
 
         <!-- Webview -->
+        <!-- <webview allowpopups plugins style="height: 100vh; z-index: 99999; width: 1024px; position: absolute;" id="webview" autosize="on" src="https://app.getzero.co/" data-home="https://app.getzero.co/"></webview> -->
         <webview allowpopups plugins style="height: 100vh; z-index: 99999; width: 1024px; position: absolute;" id="webview" autosize="on" src="https://anakin.xentricqa.com:4434/?sf=ok" data-home="https://anakin.xentricqa.com:4434/?sf=ok"></webview>
 
+        <script>
+            var ipc = require('electron').ipcRenderer;
+            var authButton = document.getElementById('controls');
+            authButton.addEventListener('click', function(){
+                // ipc.once('actionReply', function(event, response){
+                //     processResponse(response);
+                // })
+                ipc.send('invokeAction', 'someData');
+            });
+
+        </script>
 
 
 <!--         <script>
