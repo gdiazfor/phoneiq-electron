@@ -22,16 +22,11 @@ let badgesCounts = 0;
 
 //notification.silent(true)
 
-
-var ipc = require('electron').ipcMain;
-
-ipc.on('invokeAction', function(event, data){
+ipcMain.on('invokeAction', function(event, data){
     // var result = data;
     // event.sender.send('actionReply', result);
     dialog.showErrorBox("title", "content")
 });
-
-
 
 contextMenu({
     prepend: (defaultActions, params, browserWindow) => [
@@ -150,6 +145,14 @@ let initPath;
 // initialization and is ready to create browser windows.
 app.allowRendererProcessReuse = true;
 app.on("ready", () => {
+
+
+  ipcMain.on('setBadgeNumber', function(event, data){
+    // var result = data;
+    // event.sender.send('actionReply', result);
+    app.setBadgeCount(data)
+  });
+
   //console.log(dialog)
   //console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
 
@@ -203,10 +206,29 @@ app.on("ready", () => {
       allowRunningInsecureContent: true
     },
   });
+
+  // const webview = document.querySelector('webview')
+  // webview.addEventListener('ipc-message', (event) => {
+  //   console.log(event.channel)
+  //   // Prints "pong"
+  // })
   
   mainWindow.webContents.send('asynchronous-message', 'ping')
   mainWindow.loadURL("file://" + __dirname + "/index.html");
   //mainWindow.loadURL('https://anakin.xentricqa.com:4434/?sf=ok')
+
+  //mainWindow.webContents.executeJavaScript('console.log(global);');
+  
+  //let contents = mainWindow.webContents.global
+  //mainWindow.webContents.executeJavaScript('console.log(window)');
+  //console.log(contents)
+
+  // mainWindow.webContents.on('did-finish-load', ()=>{
+  //     let code = `var authButton = document.getElementById("controls");
+  //             authButton.addEventListener("click",function(){alert("clicked!");});`;
+  //     mainWindow.webContents.executeJavaScript(code);
+  // });
+
   // let contents = mainWindow.webContents
   // console.log(contents)
 
@@ -325,7 +347,7 @@ app.on("ready", () => {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
-  //mainWindow.openDevTools();
+  mainWindow.openDevTools();
 
   tray = new Tray(__dirname + '/assets/icons/png/IconTemplate.png')
   const contextMenu = Menu.buildFromTemplate([

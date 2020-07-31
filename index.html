@@ -26,7 +26,7 @@
         </div>
         <div class="thisDrag"></div>
         <!-- Topbar -->
-        <div id="controls" style="">
+        <div id="controls" style="display:none;">
             <button id="" title="Go Home">Home</button>
             <button id="">Print</button>
         </div>
@@ -43,14 +43,110 @@
         <webview allowpopups plugins style="height: 100vh; z-index: 99999; width: 1024px; position: absolute;" id="webview" autosize="on" src="https://anakin.xentricqa.com:4434/?sf=ok" data-home="https://anakin.xentricqa.com:4434/?sf=ok"></webview>
 
         <script>
-            var ipc = require('electron').ipcRenderer;
-            var authButton = document.getElementById('controls');
-            authButton.addEventListener('click', function(){
-                // ipc.once('actionReply', function(event, response){
-                //     processResponse(response);
-                // })
-                ipc.send('invokeAction', 'someData');
-            });
+
+            //var ipc = require('electron').ipcRenderer;
+
+
+            // $("#webview")[0].addEventListener("message", function(event) { 
+            //     console.log(event);
+            //     if (event.data.key == 'showDialogRenameFile') {
+            //         ipc.send('invokeAction', 'someData');
+            //     }
+            // })
+            
+            // $("#webview")[0].addEventListener("click", function(event) { 
+            //     alert("nicicicis")
+            // })
+
+            // var windowEvents = global.window;
+            // console.log(windowEvents)
+
+
+            // //var webviewEvents = document.getElementById('webview');
+
+            // windowEvents.addEventListener('message', function(){
+            //     console.log("test")
+            //        // ipc.once('actionReply', function(event, response){
+            //        //     processResponse(response);
+            //        // })
+
+            //     if (event.data.key == 'showDialogRenameFile') {
+            //         ipc.send('invokeAction', 'someData');
+            //     }
+            //     ipc.send('invokeAction', 'someData');
+            // });
+
+
+
+            // addEventListener('message', function(event){
+            //     console.log("TEST");
+            //     alert("hola")
+
+            //     if (event.data.key == 'showDialogRenameFile') {
+            //         console.log("FUNCO")
+            //         alert("chau")
+            //     }
+            // })
+
+            // window.addEventListener('message', function (event) {
+            //    if (event.data.key == "showDialogRenameFile") {
+            //      console.log("FUNCO")
+            //    }
+            // });
+
+            // window.addEventListener('message', function(event){
+            //     console.log("TEST");
+            //     alert("hola")
+
+            //     if (event.data.key == 'showDialogRenameFile') {
+            //         console.log("FUNCO")
+            //         alert("chau")
+            //     }
+            // })
+
+            // webviewEvents.addEventListener('message', function(event){
+            //     console.log("TEST");
+            //     if (event.data.key == 'showDialogRenameFile') {
+            //         console.log("FUNCO")
+            //         alert("chau")
+            //     }
+            // })
+
+
+
+            // function messageHandler() {
+            //     var messageHandler = function (event) {
+            //         if (event.data.key == 'messagesBadgeCount') {
+            //             messageBageCount = event.data.badgeCount;
+            //             updateBadgeCount();
+            //         } else if (event.data.key == 'phoneBageCount') {
+            //             if (event.data.badgeCount > phoneBageCount) {
+            //                 win.requestAttention(2);
+            //             }
+            //             phoneBageCount = event.data.badgeCount;
+            //             updateBadgeCount();
+            //         } else if (event.data.key == 'showDialogRenameFile') {
+            //             win.show();
+            //             win.focus();
+            //         } else if (event.data.key == 'conferenceBageCount') {
+            //             if (event.data.badgeCount > conferenceBageCount) {
+            //                 win.requestAttention(1);
+            //             }
+            //             conferenceBageCount = event.data.badgeCount;
+            //             updateBadgeCount();
+            //         }
+            //     };
+            //     window.addEventListener('message', messageHandler, false);
+            // }
+
+
+            // var webviewEvents = document.getElementById('webview');
+            // webviewEvents.addEventListener('click', function(){
+            //     // ipc.once('actionReply', function(event, response){
+            //     //     processResponse(response);
+            //     // })
+            //     ipc.send('invokeAction', 'someData');
+            // });
 
         </script>
 
